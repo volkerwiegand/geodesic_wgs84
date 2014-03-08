@@ -1,4 +1,29 @@
-geodesic_wgs84
-==============
+# GeodesicWgs84
 
-geodesic_wgs84 is a Ruby Gem for accurately calculating distances on the Earth's surface.
+TODO: Write a gem description
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'geodesic_wgs84'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install geodesic_wgs84
+
+## Usage
+
+TODO: Write usage instructions here
+
+## Contributing
+
+1. Fork it ( https://github.com/volkerwiegand/geodesic_wgs84/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
