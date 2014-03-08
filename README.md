@@ -1,6 +1,21 @@
-# GeodesicWgs84
+# GeodesicWgs84 -- Distance calculations on the Earth's surface
 
-TODO: Write a gem description
+This an implementation of the geodesic algorithms described in
+C. F. F. Karney "Algorithms for geodesics" ( http://dx.doi.org/10.1007/s00190-012-0578-z ).
+It uses the WGS84 standard as a reference ( http://en.wikipedia.org/wiki/World_Geodetic_System ).
+
+### From the abstract of this article
+
+Algorithms for the computation of geodesics on
+an ellipsoid of revolution are given. These provide accurate,
+robust, and fast solutions to the direct and inverse geodesic
+problems and they allow differential and integral properties
+of geodesics to be computed.
+
+### Original work
+
+The files geodesic.c and geodesic.h make up for the real work and can be found
+at ( http://geographiclib.sourceforge.net/html/C/ ).
 
 ## Installation
 
@@ -16,9 +31,23 @@ Or install it yourself as:
 
     $ gem install geodesic_wgs84
 
-## Usage
+## Sample Usage
 
-TODO: Write usage instructions here
+    require 'geodesic_wgs84'
+
+    wgs84 = Wgs84.new
+
+    wgs84.lat_lon ...
+
+    wgs84.distance ...
+
+    wgs84.average ...
+
+## Running tests
+
+Tests are based on minitest.
+
+    rake test
 
 ## Contributing
 
