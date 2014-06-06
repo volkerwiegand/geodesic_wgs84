@@ -1,13 +1,13 @@
-all: compile
+# vim: set ts=8 tw=0 noet :
+#
+# Makefile for building the Gem
+#
 
-compile:
+all:
 	rake compile
-
-install: clean
-	rake compile
-	sudo rake install
-
-clean:
-	sudo gem uninstall geodesic_wgs84 -a -x --force
-	sudo rm -rf tmp pkg lib/geodesic_wgs84/geodesic_wgs84.so
-
+	git add ext
+	git add lib
+	git add spec
+	vim lib/geodesic_wgs84/version.rb
+	git commit -a
+	rake release
