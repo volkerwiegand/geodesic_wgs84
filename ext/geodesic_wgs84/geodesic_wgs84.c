@@ -180,6 +180,41 @@ wgs84_average(VALUE klass, VALUE array, VALUE target)
 }
 
 
+static VALUE
+wgs84_center(VALUE klass, VALUE array, VALUE center)
+{
+  VALUE tmp, arr_val;
+  double min_lat, min_lon, max_lat, max_lon, tmp_lat, tmp_lon;
+  int cnt;
+
+  tmp = rb_check_array_type(center);
+  if (NIL_P(tmp))
+    rb_raise(rb_eArgError, "invalid (default) argument");
+  min_lat = max_lat = wgs84_get_value(rb_ary_entry(tmp, 0));
+  min_lon = max_lon = wgs84_get_value(rb_ary_entry(tmp, 1));
+
+  arr_val = rb_check_convert_type(array, T_ARRAY, "Array", "to_a");
+  for (cnt = 0; cnt < RARRAY_LEN(arr_val); cnt++) {
+    tmp = rb_check_array_type(rb_ary_entry(arr_val, cnt));
+    if (NIL_P(tmp))
+      rb_raise(rb_eArgError, "invalid (array) argument");
+    tmp_lat = wgs84_get_value(rb_ary_entry(tmp, 0));
+    tmp_lon = wgs84_get_value(rb_ary_entry(tmp, 1));
+    if (tmp_lat < min_lat)
+      min_lat = tmp_lat;
+    if (tmp_lon < min_lon)
+      min_lon = tmp_lon;
+    if (tmp_lat > max_lat)
+      max_lat = tmp_lat;
+    if (tmp_lon > max_lon)
+      max_lon = tmp_lon;
+  }
+  min_lat = (min_lat + max_lat) / 2.0;
+  min_lon = (min_lon + max_lon) / 2.0;
+  return rb_ary_new3(2L, rb_float_new(min_lat), rb_float_new(min_lon));
+}
+
+
 void
 Init_geodesic_wgs84(void)
 {
@@ -188,5 +223,6 @@ Init_geodesic_wgs84(void)
   rb_define_method(cWGS84, "lat_lon",    wgs84_lat_lon,  -1);
   rb_define_method(cWGS84, "distance",   wgs84_distance, -1);
   rb_define_method(cWGS84, "average",    wgs84_average,   2);
+  rb_define_method(cWGS84, "center",     wgs84_center,    2);
 }
 

@@ -43,6 +43,8 @@ Or install it yourself as:
 
     wgs84.average ...
 
+    wgs84.center ...
+
 ## Running tests
 
 Tests are based on minitest.
