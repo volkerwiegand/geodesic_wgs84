@@ -45,7 +45,10 @@ wgs84_get_value(VALUE arg)
 
     if (sscanf(buf, "%d.%d.%d,%d", &dd, &mm, &ss, &ff) == 4) {
       ff += (dd * 36000) + (mm * 600) + (ss * 10);
-      return ((double) ff / 36000.0);
+      sprintf(buf, "%.6lf", (double) ff / 36000.0);
+      sscanf(buf, "%lf", &dbl);
+      return dbl;
+      /* return ((double) ff / 36000.0); */
     }
 
     if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
