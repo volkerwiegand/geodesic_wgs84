@@ -293,11 +293,11 @@ void
 Init_geodesic_wgs84(void)
 {
   cWGS84 = rb_define_class("Wgs84", rb_cObject);
-  rb_define_method(cWGS84, "initialize",  wgs84_init,      0);
-  rb_define_method(cWGS84, "lat_lon",     wgs84_lat_lon,  -1);
-  rb_define_method(cWGS84, "lat_lon_dms", wgs84_lat_lon,  -1);
-  rb_define_method(cWGS84, "distance",    wgs84_distance, -1);
-  rb_define_method(cWGS84, "average",     wgs84_average,   2);
-  rb_define_method(cWGS84, "center",      wgs84_center,    2);
+  rb_define_method(cWGS84, "initialize",  wgs84_init,          0);
+  rb_define_method(cWGS84, "lat_lon",     wgs84_lat_lon,      -1);
+  rb_define_method(cWGS84, "lat_lon_dms", wgs84_lat_lon_dms,  -1);
+  rb_define_method(cWGS84, "distance",    wgs84_distance,     -1);
+  rb_define_method(cWGS84, "average",     wgs84_average,       2);
+  rb_define_method(cWGS84, "center",      wgs84_center,        2);
 }
 

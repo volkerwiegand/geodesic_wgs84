@@ -1,3 +1,3 @@
 module GeodesicWgs84
-  VERSION = "1.32.4"
+  VERSION = "1.32.5"
 end
