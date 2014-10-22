@@ -60,6 +60,7 @@ wgs84_get_value(VALUE arg)
   }
 
   rb_raise(rb_eArgError, "invalid (lat/lon) argument");
+  return 0.0;
 }
 
 
