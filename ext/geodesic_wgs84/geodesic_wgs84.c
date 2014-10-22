@@ -49,6 +49,7 @@ wgs84_get_value(VALUE arg)
       dbl += (double) ss /  3600.0;
       dbl += (double) ff / 36000.0;
       sprintf(buf, "%.6f", dbl);
+      printf("DMS->DEG: '%s'\n", buf);
     } else if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
       *strchr(buf, ',') = '.';
     }
