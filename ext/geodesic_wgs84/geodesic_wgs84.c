@@ -132,24 +132,31 @@ static VALUE
 wgs84_lat_lon_dms(int argc, VALUE *argv, VALUE klass)
 {
   double lat, lon;
+  int valid = 0;
   char lat_buf[64], lon_buf[64];
   VALUE tmp;
 
   if (argc == 2) {
     lat = wgs84_get_value(argv[0]);
     lon = wgs84_get_value(argv[1]);
-    return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
+    valid = 1;
   }
 
   if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
     lat = wgs84_get_value(rb_ary_entry(*argv, 0));
     lon = wgs84_get_value(rb_ary_entry(*argv, 1));
-    return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
+    valid = 1;
   }
 
   if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
     lat = wgs84_get_value(rb_ary_entry(tmp, 0));
     lon = wgs84_get_value(rb_ary_entry(tmp, 1));
+    valid = 1;
+  }
+
+  if (valid == 1) {
+    wgs84_make_dms(lat, lat_buf);
+    wgs84_make_dms(lon, lon_buf);
     return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
   }
 
