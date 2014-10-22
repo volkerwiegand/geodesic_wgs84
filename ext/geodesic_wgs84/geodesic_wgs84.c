@@ -44,16 +44,13 @@ wgs84_get_value(VALUE arg)
     memcpy(buf, RSTRING_PTR(arg), RSTRING_LEN(arg));
 
     if (sscanf(buf, "%d.%d.%d,%d", &dd, &mm, &ss, &ff) == 4) {
-      dbl  = (double) dd;
-      dbl += (double) mm /    60.0;
-      dbl += (double) ss /  3600.0;
-      dbl += (double) ff / 36000.0;
-      sprintf(buf, "%.6f", dbl);
-      printf("DMS->DEG: '%s'\n", buf);
-    } else if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
-      *strchr(buf, ',') = '.';
+      ff += (dd * 36000) + (mm * 600) + (ss * 10);
+      return ((double) ff / 36000.0);
     }
 
+    if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
+      *strchr(buf, ',') = '.';
+    }
     if (sscanf(buf, "%d.%d", &dd, &ff) == 2) {
       sscanf(buf, "%lf", &dbl);
       return dbl;
@@ -122,7 +119,8 @@ wgs84_make_dms(double val, char *buf)
 
   /* get tenth of seconds */
   val *= 10.0;
-  sprintf(ptr, ",%.0f", val);
+  tmp = (int) round(val);
+  sprintf(ptr, ",%d", val);
 }
 
 
@@ -130,36 +128,26 @@ static VALUE
 wgs84_lat_lon_dms(int argc, VALUE *argv, VALUE klass)
 {
   double lat, lon;
-  int valid = 0;
   char lat_buf[64], lon_buf[64];
   VALUE tmp;
 
   if (argc == 2) {
     lat = wgs84_get_value(argv[0]);
     lon = wgs84_get_value(argv[1]);
-    valid = 1;
-  }
-
-  if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
+  } else if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
     lat = wgs84_get_value(rb_ary_entry(*argv, 0));
     lon = wgs84_get_value(rb_ary_entry(*argv, 1));
-    valid = 1;
-  }
-
-  if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
+  } else if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
     lat = wgs84_get_value(rb_ary_entry(tmp, 0));
     lon = wgs84_get_value(rb_ary_entry(tmp, 1));
-    valid = 1;
+  } else {
+    rb_raise(rb_eArgError, "wrong number of arguments");
+    return Qnil;
   }
 
-  if (valid == 1) {
-    wgs84_make_dms(lat, lat_buf);
-    wgs84_make_dms(lon, lon_buf);
-    return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
-  }
-
-  rb_raise(rb_eArgError, "wrong number of arguments");
-  return Qnil;
+  wgs84_make_dms(lat, lat_buf);
+  wgs84_make_dms(lon, lon_buf);
+  return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
 }
 
 
