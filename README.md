@@ -36,6 +36,9 @@ Or install it yourself as:
 The representation of a DMS (degree minute second) format is 'dd.mm.ss,f'
 where f means tenth of seconds (fraction).
 
+Also, we are working with 6 decimal places, which will render an accuracy
+of roughly 10cm. See ( http://en.wikipedia.org/wiki/Decimal_degrees#Accuracy )
+
     require 'geodesic_wgs84'
 
     wgs84 = Wgs84.new

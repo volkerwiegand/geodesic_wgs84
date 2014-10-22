@@ -48,16 +48,12 @@ wgs84_get_value(VALUE arg)
       dbl += (double) mm /    60.0;
       dbl += (double) ss /  3600.0;
       dbl += (double) ff / 36000.0;
-      return dbl;
+      sprintf(buf, "%.6f", dbl);
+    } else if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
+      *strchr(buf, ',') = '.';
     }
 
     if (sscanf(buf, "%d.%d", &dd, &ff) == 2) {
-      sscanf(buf, "%lf", &dbl);
-      return dbl;
-    }
-
-    if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
-      *strchr(buf, ',') = '.';
       sscanf(buf, "%lf", &dbl);
       return dbl;
     }
