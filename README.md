@@ -33,11 +33,16 @@ Or install it yourself as:
 
 ## Sample Usage
 
+The representation of a DMS (degree minute second) format is 'dd.mm.ss,f'
+where f means tenth of seconds (fraction).
+
     require 'geodesic_wgs84'
 
     wgs84 = Wgs84.new
 
     wgs84.lat_lon ...
+
+    wgs84.lat_lon_dms ...
 
     wgs84.distance ...
 

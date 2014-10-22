@@ -5,6 +5,9 @@
  */
 
 #include <ruby.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
 #include "geodesic.h"
 
 
@@ -41,9 +44,11 @@ wgs84_get_value(VALUE arg)
     memcpy(buf, RSTRING_PTR(arg), RSTRING_LEN(arg));
 
     if (sscanf(buf, "%d.%d.%d,%d", &dd, &mm, &ss, &ff) == 4) {
-      // Round number to 6 digits
-      dbl = ((double) dd + ((((double) mm * 600.0) + ((double) ss * 10.0) + (double) ff) / 36000.0)) * 1000000.0;
-      return round(dbl) / 1000000.0;
+      dbl  = (double) dd;
+      dbl += (double) mm /    60.0;
+      dbl += (double) ss /  3600.0;
+      dbl += (double) ff / 36000.0;
+      return dbl;
     }
 
     if (sscanf(buf, "%d.%d", &dd, &ff) == 2) {
@@ -84,6 +89,68 @@ wgs84_lat_lon(int argc, VALUE *argv, VALUE klass)
     lat = wgs84_get_value(rb_ary_entry(tmp, 0));
     lon = wgs84_get_value(rb_ary_entry(tmp, 1));
     return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
+  }
+
+  rb_raise(rb_eArgError, "wrong number of arguments");
+  return Qnil;
+}
+
+
+static void
+wgs84_make_dms(double val, char *buf)
+{
+  int tmp;
+  char *ptr;
+
+  /* get degrees */
+  tmp = (int) val;
+  sprintf(buf, "%02d", tmp);
+  val -= (double) tmp;
+  ptr = buf + strlen(buf);
+
+  /* get minutes */
+  val *= 60.0;
+  tmp = (int) val;
+  sprintf(ptr, ".%02d", tmp);
+  val -= (double) tmp;
+  ptr = buf + strlen(buf);
+
+  /* get seconds */
+  val *= 60.0;
+  tmp = (int) val;
+  sprintf(ptr, ".%02d", tmp);
+  val -= (double) tmp;
+  ptr = buf + strlen(buf);
+
+  /* get tenth of seconds */
+  val *= 10.0;
+  sprintf(ptr, ",%.0f", val);
+}
+
+
+static VALUE
+wgs84_lat_lon_dms(int argc, VALUE *argv, VALUE klass)
+{
+  double lat, lon;
+  char lat_buf[64], lon_buf[64];
+  VALUE tmp;
+
+  if (argc == 2) {
+    lat = wgs84_get_value(argv[0]);
+    lon = wgs84_get_value(argv[1]);
+    return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
+  }
+
+  if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
+    lat = wgs84_get_value(rb_ary_entry(*argv, 0));
+    lon = wgs84_get_value(rb_ary_entry(*argv, 1));
+    return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
+  }
+
+  if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
+    lat = wgs84_get_value(rb_ary_entry(tmp, 0));
+    lon = wgs84_get_value(rb_ary_entry(tmp, 1));
+    return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
   }
 
   rb_raise(rb_eArgError, "wrong number of arguments");
@@ -219,10 +286,11 @@ void
 Init_geodesic_wgs84(void)
 {
   cWGS84 = rb_define_class("Wgs84", rb_cObject);
-  rb_define_method(cWGS84, "initialize", wgs84_init,      0);
-  rb_define_method(cWGS84, "lat_lon",    wgs84_lat_lon,  -1);
-  rb_define_method(cWGS84, "distance",   wgs84_distance, -1);
-  rb_define_method(cWGS84, "average",    wgs84_average,   2);
-  rb_define_method(cWGS84, "center",     wgs84_center,    2);
+  rb_define_method(cWGS84, "initialize",  wgs84_init,      0);
+  rb_define_method(cWGS84, "lat_lon",     wgs84_lat_lon,  -1);
+  rb_define_method(cWGS84, "lat_lon_dms", wgs84_lat_lon,  -1);
+  rb_define_method(cWGS84, "distance",    wgs84_distance, -1);
+  rb_define_method(cWGS84, "average",     wgs84_average,   2);
+  rb_define_method(cWGS84, "center",      wgs84_center,    2);
 }
 
