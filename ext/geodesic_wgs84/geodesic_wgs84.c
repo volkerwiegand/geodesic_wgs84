@@ -45,15 +45,13 @@ wgs84_get_value(VALUE arg)
 
     if (sscanf(buf, "%d.%d.%d,%d", &dd, &mm, &ss, &ff) == 4) {
       ff += (dd * 36000) + (mm * 600) + (ss * 10);
-      sprintf(buf, "%.6lf", (double) ff / 36000.0);
-      sscanf(buf, "%lf", &dbl);
-      return dbl;
-      /* return ((double) ff / 36000.0); */
-    }
-
-    if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
+      dbl = (double) ff;
+      dbl /= 36000.0;
+      sprintf(buf, "%.6lf", dbl);
+    } else if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
       *strchr(buf, ',') = '.';
     }
+
     if (sscanf(buf, "%d.%d", &dd, &ff) == 2) {
       sscanf(buf, "%lf", &dbl);
       return dbl;
@@ -74,56 +72,33 @@ wgs84_lat_lon(int argc, VALUE *argv, VALUE klass)
   if (argc == 2) {
     lat = wgs84_get_value(argv[0]);
     lon = wgs84_get_value(argv[1]);
-    return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
-  }
-
-  if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
+  } else if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
     lat = wgs84_get_value(rb_ary_entry(*argv, 0));
     lon = wgs84_get_value(rb_ary_entry(*argv, 1));
-    return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
-  }
-
-  if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
+  } else if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
     lat = wgs84_get_value(rb_ary_entry(tmp, 0));
     lon = wgs84_get_value(rb_ary_entry(tmp, 1));
-    return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
+  } else {
+    rb_raise(rb_eArgError, "wrong number of arguments");
+    return Qnil;
   }
 
-  rb_raise(rb_eArgError, "wrong number of arguments");
-  return Qnil;
+  return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
 }
 
 
 static void
 wgs84_make_dms(double val, char *buf)
 {
-  int tmp;
   char *ptr;
 
-  /* get degrees */
-  tmp = (int) val;
-  sprintf(buf, "%02d", tmp);
-  val -= (double) tmp;
+  sprintf(buf, "%d.", (int) trunc(val));
   ptr = buf + strlen(buf);
-
-  /* get minutes */
-  val *= 60.0;
-  tmp = (int) val;
-  sprintf(ptr, ".%02d", tmp);
-  val -= (double) tmp;
+  sprintf(ptr, "%d.", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
   ptr = buf + strlen(buf);
-
-  /* get seconds */
-  val *= 60.0;
-  tmp = (int) val;
-  sprintf(ptr, ".%02d", tmp);
-  val -= (double) tmp;
-  ptr = buf + strlen(buf);
-
-  /* get tenth of seconds */
-  val *= 10.0;
-  tmp = (int) round(val);
-  sprintf(ptr, ",%d", val);
+  sprintf(ptr, "%.1lf", fmod(fabs(val) * 3600.0, 60.0));
+  if ((ptr = strchr(ptr, '.')) != NULL)
+    *ptr = ',';
 }
 
 
