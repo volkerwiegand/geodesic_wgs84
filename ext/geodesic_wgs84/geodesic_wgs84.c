@@ -33,12 +33,6 @@ wgs84_get_value(VALUE arg)
   int dd, mm, ss, ff;
   double dbl;
 
-  if (TYPE(arg) == T_FLOAT)
-    return NUM2DBL(arg);
-
-  if (TYPE(arg) == T_FIXNUM)
-    return (double) NUM2INT(arg);
-
   if (TYPE(arg) == T_STRING && RSTRING_LEN(arg) < 60) {
     memset(buf, 0, sizeof(buf));
     memcpy(buf, RSTRING_PTR(arg), RSTRING_LEN(arg));
@@ -57,6 +51,12 @@ wgs84_get_value(VALUE arg)
       return dbl;
     }
   }
+
+  if (TYPE(arg) == T_FLOAT)
+    return NUM2DBL(arg);
+
+  if (TYPE(arg) == T_FIXNUM)
+    return (double) NUM2INT(arg);
 
   rb_raise(rb_eArgError, "invalid (lat/lon) argument");
   return 0.0;
