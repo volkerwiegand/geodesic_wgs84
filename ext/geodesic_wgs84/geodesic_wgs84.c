@@ -63,6 +63,45 @@ wgs84_get_value(VALUE arg)
 }
 
 
+static void
+wgs84_make_dms(double val, char *buf)
+{
+  char *ptr;
+
+  sprintf(buf, "%d.", (int) trunc(val));
+  ptr = buf + strlen(buf);
+  sprintf(ptr, "%d.", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
+  ptr = buf + strlen(buf);
+  sprintf(ptr, "%.1lf", fmod(fabs(val) * 3600.0, 60.0));
+  if ((ptr = strchr(ptr, '.')) != NULL)
+    *ptr = ',';
+}
+
+
+static VALUE
+wgs84_as_deg(VALUE klass, VALUE arg)
+{
+  double val;
+
+  val = wgs84_get_value(arg);
+
+  return rb_float_new(val);
+}
+
+
+static VALUE
+wgs84_as_dms(VALUE klass, VALUE arg)
+{
+  double val;
+  char buf[64];
+
+  val = wgs84_get_value(arg);
+  wgs84_make_dms(val, buf);
+
+  return rb_str_new2(buf);
+}
+
+
 static VALUE
 wgs84_lat_lon(int argc, VALUE *argv, VALUE klass)
 {
@@ -84,21 +123,6 @@ wgs84_lat_lon(int argc, VALUE *argv, VALUE klass)
   }
 
   return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
-}
-
-
-static void
-wgs84_make_dms(double val, char *buf)
-{
-  char *ptr;
-
-  sprintf(buf, "%d.", (int) trunc(val));
-  ptr = buf + strlen(buf);
-  sprintf(ptr, "%d.", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
-  ptr = buf + strlen(buf);
-  sprintf(ptr, "%.1lf", fmod(fabs(val) * 3600.0, 60.0));
-  if ((ptr = strchr(ptr, '.')) != NULL)
-    *ptr = ',';
 }
 
 
@@ -258,6 +282,8 @@ Init_geodesic_wgs84(void)
 {
   cWGS84 = rb_define_class("Wgs84", rb_cObject);
   rb_define_method(cWGS84, "initialize",  wgs84_init,          0);
+  rb_define_method(cWGS84, "as_deg",      wgs84_as_deg,        1);
+  rb_define_method(cWGS84, "as_dms",      wgs84_as_dms,        1);
   rb_define_method(cWGS84, "lat_lon",     wgs84_lat_lon,      -1);
   rb_define_method(cWGS84, "lat_lon_dms", wgs84_lat_lon_dms,  -1);
   rb_define_method(cWGS84, "distance",    wgs84_distance,     -1);
