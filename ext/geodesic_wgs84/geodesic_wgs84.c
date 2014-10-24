@@ -107,45 +107,24 @@ wgs84_lat_lon(int argc, VALUE *argv, VALUE klass)
   if (argc == 2) {
     lat = wgs84_get_value(argv[0]);
     lon = wgs84_get_value(argv[1]);
-  } else if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
-    lat = wgs84_get_value(rb_ary_entry(*argv, 0));
-    lon = wgs84_get_value(rb_ary_entry(*argv, 1));
-  } else if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
-    lat = wgs84_get_value(rb_ary_entry(tmp, 0));
-    lon = wgs84_get_value(rb_ary_entry(tmp, 1));
-  } else {
+    return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
+  }
+
+  if (argc != 1) {
     rb_raise(rb_eArgError, "wrong number of arguments");
     return Qnil;
   }
 
+  if (TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
+    lat = wgs84_get_value(rb_ary_entry(*argv, 0));
+    lon = wgs84_get_value(rb_ary_entry(*argv, 1));
+    return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
+  }
+
+  tmp = rb_funcall(*argv, rb_intern("to_lat_lon"), 0);
+  lat = wgs84_get_value(rb_ary_entry(tmp, 0));
+  lon = wgs84_get_value(rb_ary_entry(tmp, 1));
   return rb_ary_new3(2L, rb_float_new(lat), rb_float_new(lon));
-}
-
-
-static VALUE
-wgs84_lat_lon_dms(int argc, VALUE *argv, VALUE klass)
-{
-  double lat, lon;
-  char lat_buf[64], lon_buf[64];
-  VALUE tmp;
-
-  if (argc == 2) {
-    lat = wgs84_get_value(argv[0]);
-    lon = wgs84_get_value(argv[1]);
-  } else if (argc == 1 && TYPE(*argv) == T_ARRAY && RARRAY_LEN(*argv) == 2) {
-    lat = wgs84_get_value(rb_ary_entry(*argv, 0));
-    lon = wgs84_get_value(rb_ary_entry(*argv, 1));
-  } else if (argc == 1 && !NIL_P(tmp = rb_check_array_type(*argv))) {
-    lat = wgs84_get_value(rb_ary_entry(tmp, 0));
-    lon = wgs84_get_value(rb_ary_entry(tmp, 1));
-  } else {
-    rb_raise(rb_eArgError, "wrong number of arguments");
-    return Qnil;
-  }
-
-  wgs84_make_dms(lat, lat_buf);
-  wgs84_make_dms(lon, lon_buf);
-  return rb_ary_new3(2L, rb_str_new2(lat_buf), rb_str_new2(lon_buf));
 }
 
 
@@ -281,7 +260,6 @@ Init_geodesic_wgs84(void)
   rb_define_method(cWGS84, "as_deg",      wgs84_as_deg,        1);
   rb_define_method(cWGS84, "as_dms",      wgs84_as_dms,        1);
   rb_define_method(cWGS84, "lat_lon",     wgs84_lat_lon,      -1);
-  rb_define_method(cWGS84, "lat_lon_dms", wgs84_lat_lon_dms,  -1);
   rb_define_method(cWGS84, "distance",    wgs84_distance,     -1);
   rb_define_method(cWGS84, "average",     wgs84_average,       2);
   rb_define_method(cWGS84, "center",      wgs84_center,        2);
