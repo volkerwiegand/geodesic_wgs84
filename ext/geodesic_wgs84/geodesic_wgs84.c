@@ -33,17 +33,21 @@ wgs84_get_value(VALUE arg)
   int dd, mm, ss, ff;
   double dbl;
 
+  if (TYPE(arg) == T_FLOAT)
+    return NUM2DBL(arg);
+
+  if (TYPE(arg) == T_FIXNUM)
+    return (double) NUM2INT(arg);
+
   if (TYPE(arg) == T_STRING && RSTRING_LEN(arg) < 60) {
     memset(buf, 0, sizeof(buf));
     memcpy(buf, RSTRING_PTR(arg), RSTRING_LEN(arg));
 
-    if (sscanf(buf, "%d.%d.%d,%d", &dd, &mm, &ss, &ff) == 4) {
+    if (sscanf(buf, "%d %d %d.%d", &dd, &mm, &ss, &ff) == 4) {
       ff += (dd * 36000) + (mm * 600) + (ss * 10);
       dbl = (double) ff;
       dbl /= 36000.0;
       sprintf(buf, "%.6lf", dbl);
-    } else if (sscanf(buf, "%d,%d", &dd, &ff) == 2) {
-      *strchr(buf, ',') = '.';
     }
 
     if (sscanf(buf, "%d.%d", &dd, &ff) == 2) {
@@ -51,12 +55,6 @@ wgs84_get_value(VALUE arg)
       return dbl;
     }
   }
-
-  if (TYPE(arg) == T_FLOAT)
-    return NUM2DBL(arg);
-
-  if (TYPE(arg) == T_FIXNUM)
-    return (double) NUM2INT(arg);
 
   rb_raise(rb_eArgError, "invalid (lat/lon) argument");
   return 0.0;
@@ -68,13 +66,11 @@ wgs84_make_dms(double val, char *buf)
 {
   char *ptr;
 
-  sprintf(buf, "%d.", (int) trunc(val));
+  sprintf(buf, "%d ", (int) trunc(val));
   ptr = buf + strlen(buf);
-  sprintf(ptr, "%d.", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
+  sprintf(ptr, "%d ", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
   ptr = buf + strlen(buf);
   sprintf(ptr, "%.1lf", fmod(fabs(val) * 3600.0, 60.0));
-  if ((ptr = strchr(ptr, '.')) != NULL)
-    *ptr = ',';
 }
 
 
