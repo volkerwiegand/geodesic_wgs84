@@ -79,6 +79,7 @@ wgs84_as_dms(VALUE klass, VALUE arg)
   char buf[64], *ptr;
 
   val = wgs84_get_value(arg);
+  memset(buf, 0, sizeof(buf));
   sprintf(buf, "%d ", (int) trunc(val));
   ptr = buf + strlen(buf);
   sprintf(ptr, "%d ", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
@@ -93,10 +94,14 @@ static VALUE
 wgs84_as_bigdec(VALUE klass, VALUE arg)
 {
   double val;
-  char buf[64];
+  char buf[64], *ptr;
 
   val = wgs84_get_value(arg);
-  sprintf(buf, "%.6lf", val + 0.0000005);
+  memset(buf, 0, sizeof(buf));
+  sprintf(buf, "%.0lf", round(val * 1000000.0));
+  ptr = buf + (strlen(buf) - 6);
+  memmove(ptr + 1, ptr, 6);
+  *ptr = '.';
 
   return rb_funcall(rb_path2class("BigDecimal"), rb_intern("new"), 1, rb_str_new2(buf));
 }
