@@ -27,6 +27,16 @@ class TestGeodesicWgs84 < MiniTest::Test
     assert_equal -1.0, @wgs84.as_bigdec(-1).to_f
   end
 
+  def test_bigdec_6
+    num = BigDecimal.new("50.8338332")
+    assert_equal 50.833833, @wgs84.as_bigdec(num).to_f
+  end
+
+  def test_bigdec_7
+    num = BigDecimal.new("50.8338337")
+    assert_equal 50.833834, @wgs84.as_bigdec(num).to_f
+  end
+
   def test_deg_as_deg
     assert_equal 50.833833, @wgs84.as_deg(50.833833)
   end
