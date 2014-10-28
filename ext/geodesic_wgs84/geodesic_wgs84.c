@@ -33,6 +33,9 @@ wgs84_get_value(VALUE arg)
   int dd, mm, ss, ff;
   double dbl;
 
+  if (TYPE(arg) == T_DATA) // assume BigDecimal and try to convert
+    arg = rb_funcall(arg, rb_intern("to_f"), 0);
+
   if (TYPE(arg) == T_FLOAT)
     return NUM2DBL(arg);
 
