@@ -98,7 +98,7 @@ wgs84_as_bigdec(VALUE klass, VALUE arg)
 
   val = wgs84_get_value(arg);
   memset(buf, 0, sizeof(buf));
-  sprintf(buf, "%.0lf", round(val * 1000000.0));
+  sprintf(buf, "%07.0lf", round(val * 1000000.0));
   ptr = buf + (strlen(buf) - 6);
   memmove(ptr + 1, ptr, 6);
   *ptr = '.';
