@@ -61,19 +61,6 @@ wgs84_get_value(VALUE arg)
 }
 
 
-static void
-wgs84_make_dms(double val, char *buf)
-{
-  char *ptr;
-
-  sprintf(buf, "%d ", (int) trunc(val));
-  ptr = buf + strlen(buf);
-  sprintf(ptr, "%d ", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
-  ptr = buf + strlen(buf);
-  sprintf(ptr, "%.1lf", fmod(fabs(val) * 3600.0, 60.0));
-}
-
-
 static VALUE
 wgs84_as_deg(VALUE klass, VALUE arg)
 {
@@ -89,12 +76,29 @@ static VALUE
 wgs84_as_dms(VALUE klass, VALUE arg)
 {
   double val;
+  char buf[64], *ptr;
+
+  val = wgs84_get_value(arg);
+  sprintf(buf, "%d ", (int) trunc(val));
+  ptr = buf + strlen(buf);
+  sprintf(ptr, "%d ", (int) fmod(trunc(fabs(val) * 60.0), 60.0));
+  ptr = buf + strlen(buf);
+  sprintf(ptr, "%.1lf", fmod(fabs(val) * 3600.0, 60.0));
+
+  return rb_str_new2(buf);
+}
+
+
+static VALUE
+wgs84_as_bigdec(VALUE klass, VALUE arg)
+{
+  double val;
   char buf[64];
 
   val = wgs84_get_value(arg);
-  wgs84_make_dms(val, buf);
+  sprintf(buf, "%.6lf", val + 0.0000005);
 
-  return rb_str_new2(buf);
+  return rb_funcall(rb_path2class("BigDecimal"), rb_intern("new"), 1, rb_str_new2(buf));
 }
 
 
@@ -259,6 +263,7 @@ Init_geodesic_wgs84(void)
   rb_define_method(cWGS84, "initialize",  wgs84_init,          0);
   rb_define_method(cWGS84, "as_deg",      wgs84_as_deg,        1);
   rb_define_method(cWGS84, "as_dms",      wgs84_as_dms,        1);
+  rb_define_method(cWGS84, "as_bigdec",   wgs84_as_bigdec,     1);
   rb_define_method(cWGS84, "lat_lon",     wgs84_lat_lon,      -1);
   rb_define_method(cWGS84, "distance",    wgs84_distance,     -1);
   rb_define_method(cWGS84, "average",     wgs84_average,       2);
