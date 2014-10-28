@@ -1,9 +1,30 @@
 require 'minitest/autorun'
 require 'geodesic_wgs84'
+require 'bigdecimal'
 
 class TestGeodesicWgs84 < MiniTest::Test
   def setup
     @wgs84 = Wgs84.new
+  end
+
+  def test_bigdec_1
+    assert_equal 50.833833, @wgs84.as_bigdec(50.833833).to_f
+  end
+
+  def test_bigdec_2
+    assert_equal 50.833833, @wgs84.as_bigdec(50.8338332).to_f
+  end
+
+  def test_bigdec_3
+    assert_equal 50.833834, @wgs84.as_bigdec(50.8338337).to_f
+  end
+
+  def test_bigdec_4
+    assert_equal 0.0, @wgs84.as_bigdec(0).to_f
+  end
+
+  def test_bigdec_5
+    assert_equal -1.0, @wgs84.as_bigdec(-1).to_f
   end
 
   def test_deg_as_deg
