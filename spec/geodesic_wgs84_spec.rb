@@ -41,16 +41,24 @@ class TestGeodesicWgs84 < MiniTest::Test
     assert_equal 50.833833, @wgs84.as_deg(50.833833)
   end
 
-  def test_as_deg
+  def test_dms_as_deg
     assert_equal 50.833833, @wgs84.as_deg("50 50 01.8")
   end
 
-  def test_deg_as
+  def test_deg_as_dms
     assert_equal "50 50 1.8", @wgs84.as_dms(50.833833)
   end
 
-  def test_as
+  def test_dms_as_dms
     assert_equal "50 50 1.8", @wgs84.as_dms("50 50 01.8")
+  end
+
+  def test_deg_as_dms_a
+    assert_equal " 9  1  9.2", @wgs84.as_dms_a(9.019222)
+  end
+
+  def test_deg_as_dms_z
+    assert_equal "09 01 09.2", @wgs84.as_dms_z(9.019222)
   end
 
   def test_lat_lon_two_doubles
