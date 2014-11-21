@@ -124,5 +124,13 @@ class TestGeodesicWgs84 < MiniTest::Test
   def test_lat_lon_wetzlar
     assert_equal [50.553778, 8.492278], @wgs84.lat_lon("50 33 13.6", "8 29 32.2")
   end
+
+  def test_dist_limburg_marburg
+    assert_equal [68058, -134], @wgs84.distance(50.833833, 8.769333, 50.405778, 8.082222)
+  end
+
+  def test_dist_course_limburg_marburg
+    assert_equal [68058, -134, "SW"], @wgs84.dist_course(50.833833, 8.769333, 50.405778, 8.082222)
+  end
 end
 
