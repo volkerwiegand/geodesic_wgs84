@@ -9,14 +9,14 @@ all: build
 rel: build
 	vim lib/geodesic_wgs84/version.rb
 	git commit -a
-	sudo gem uninstall geodesic_wgs84 --all
+	gem uninstall geodesic_wgs84 --all
 	rake release
 
 install: build
 	git commit -a
-	sudo gem uninstall geodesic_wgs84 --all
-	sudo rake install
-	sudo rm -rf pkg
+	gem uninstall geodesic_wgs84 --all
+	rake install
+	rm -rf pkg
 
 build:
 	rake compile
