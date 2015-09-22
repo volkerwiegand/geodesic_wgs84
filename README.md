@@ -1,7 +1,7 @@
 # GeodesicWgs84 -- Distance calculations on the Earth's surface
 
 This an implementation of the geodesic algorithms described in
-C. F. F. Karney "Algorithms for geodesics" ( http://dx.doi.org/10.1007/s00190-012-0578-z ).
+C. F. F. Karney "Algorithms for geodesics" ( https://dx.doi.org/10.1007/s00190-012-0578-z ).
 It uses the WGS84 standard as a reference ( http://en.wikipedia.org/wiki/World_Geodetic_System ).
 
 ### From the abstract of this article
@@ -16,6 +16,8 @@ of geodesics to be computed.
 
 The files geodesic.c and geodesic.h make up for the real work and can be found
 at ( http://geographiclib.sourceforge.net/html/C/ ).
+
+The version of this gem aims to follow the author's version.
 
 ## Installation
 

@@ -6,7 +6,7 @@ require 'geodesic_wgs84/version'
 Gem::Specification.new do |spec|
   spec.name          = "geodesic_wgs84"
   spec.version       = GeodesicWgs84::VERSION
-  spec.date          = "2014-03-06"
+  spec.date          = "2015-09-23"
   spec.authors       = ["Volker Wiegand"]
   spec.email         = ["volker.wiegand@cvw.de"]
   spec.summary       = "Calculate distances on Earth using WGS84"
